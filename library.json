@@ -1,0 +1,21 @@
+{
+  "name": "goblib",
+  "description": "Library for C++11 or later. Not dependent on specific hardware.",
+  "keywords": "other,c++11,c++14,c++17",
+  "authors": {
+    "name": "GOB",
+    "url": "https://github.com/GOB52",
+    "maintainer": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GOB52/goblib.git"
+  },
+  "version": "0.1.0",
+  "build": {
+    "libArchive": false
+  },
+  "license": "MIT",
+  "platforms": "*",
+  "frameworks": "*"
+}
