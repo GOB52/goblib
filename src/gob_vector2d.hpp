@@ -34,6 +34,7 @@ template<typename T> class Vector2 : public Shape<T>
     constexpr Vector2() : _x(0), _y(0) {}
     constexpr Vector2(T x, T y) : _x(x), _y(y) {}
     constexpr Vector2(const Vector2<T>& v) : _x(v._x), _y(v._y) {}
+    constexpr Vector2(const Point<T>& v) : _x(v.x()), _y(v.y()) {}
     Vector2(Vector2<T>&& o) : _x(o._x), _y(o._y) {/*o.zero();*/ }
     template<typename U> constexpr Vector2(const Vector2<U>& v) : _x(static_cast<T>(v.x())), _y(static_cast<T>(v.y())) {}
     /// @}
@@ -296,7 +297,6 @@ template<typename T> const Vector2<T> Vector2<T>::X_AXIS = Vector2<T>(1, 0); //!
 template<typename T> const Vector2<T> Vector2<T>::Y_AXIS = Vector2<T>(0, 1); //!< Y axis.
 template<typename T> const Vector2<T> Vector2<T>::ZERO_VECTOR = Vector2<T>(0, 0); //!< Zero vector
 #endif
-
 
 /// @name Arithmetic
 /// @{
