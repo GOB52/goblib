@@ -90,10 +90,11 @@ class Rectangle : public Shape <T>
     constexpr GOBLIB_INLINE bool empty() const { return _w <= T(0) || _h <= T(0); }
     constexpr GOBLIB_INLINE bool valid() const { return !empty() && !(_pos.x() > std::numeric_limits<T>::max() - _w) && !(_pos.y() > std::numeric_limits<T>::max() - _h); }
 
+    constexpr GOBLIB_INLINE bool contains(const Point<T>& pos) { return contains(pos.x(), pos.y()); }
     constexpr GOBLIB_INLINE bool contains(T x, T y) const
     {
         return valid() &&
-                x >= left() && x <= right() && y >= top() && y <= right();
+                x >= left() && x <= right() && y >= top() && y <= bottom();
     }
     constexpr GOBLIB_INLINE bool contains(const Rectangle& r) const
     {
