@@ -34,6 +34,7 @@ template<typename T> class Vector2 : public Shape<T>
     constexpr Vector2() : _x(0), _y(0) {}
     constexpr Vector2(T x, T y) : _x(x), _y(y) {}
     constexpr Vector2(const Vector2<T>& v) : _x(v._x), _y(v._y) {}
+    constexpr Vector2(const Point<T>& v) : _x(v.x()), _y(v.y()) {}
     Vector2(Vector2<T>&& o) : _x(o._x), _y(o._y) {/*o.zero();*/ }
     template<typename U> constexpr Vector2(const Vector2<U>& v) : _x(static_cast<T>(v.x())), _y(static_cast<T>(v.y())) {}
     /// @}
@@ -297,7 +298,6 @@ template<typename T> const Vector2<T> Vector2<T>::Y_AXIS = Vector2<T>(0, 1); //!
 template<typename T> const Vector2<T> Vector2<T>::ZERO_VECTOR = Vector2<T>(0, 0); //!< Zero vector
 #endif
 
-
 /// @name Arithmetic
 /// @{
 template<typename T> GOBLIB_INLINE
@@ -343,6 +343,69 @@ constexpr Vector2<T> operator/(const Vector2<T>& a, const Vector2<T>& b)
 }
 /// @}
 
+/// @name Calculation
+/// @{ 
+
+// @brief Is v left of bs - be vector?
+template<typename T> GOBLIB_INLINE
+bool isLeft(const Vector2<T>& v, const Vector2<T>& bs, const Vector2<T>& be)
+{
+    return std::isless((be - bs).cross(v - bs), 0.0f);
+}
+// @brief Is v right of bs - be vector?
+template<typename T> GOBLIB_INLINE
+bool isRight(const Vector2<T>& v, const Vector2<T>& bs, const Vector2<T>& be)
+{
+    return std::isgreater((be - bs).cross(v - bs), 0.0f);
+}
+
+// @brief Is as - ae vector intersect bs - be vector?
+// @retval true intersect
+template<typename T>
+bool isIntersect(const Vector2<T>& as, const Vector2<T>& ae, const Vector2<T>& bs, const Vector2<T>& be)
+{
+    auto v1 = ae - as;
+    auto v2 = be - bs;
+    auto cv1v2 = v1.cross(v2);
+
+    if(cv1v2 == 0.0f) { return false; } // parallel?
+    
+    auto v = bs - as;
+    auto t1 = v.cross(v2) / cv1v2;
+    auto t2 = v.cross(v1) / cv1v2;
+
+    return(std::isless(t1, 0.0f) || std::isgreater(t1, 1.0f) ||
+           std::isless(t2, 0.0f) || std::isgreater(t2, 1.0f)) ? false : true;
+}
+
+// @brief get crossing point and reflection point if intersect
+// @retval true intersect
+template<typename T>
+bool reflect(const Vector2<T>& as, const Vector2<T>& ae, const Vector2<T>& bs, const Vector2<T>& be, Vector2<T>& cp, Vector2<T>& rp)
+{
+    auto v1 = ae - as;
+    auto v2 = be - bs;
+    auto cv1v2 = v1.cross(v2);
+
+    if(cv1v2 == 0.0f) { return false; } // parallel?
+    
+    auto v = bs - as;
+    auto t1 = v.cross(v2) / cv1v2;
+    auto t2 = v.cross(v1) / cv1v2;
+
+    // No crossing?
+    if(std::isless(t1, 0.0f) || std::isgreater(t1, 1.0f) ||
+       std::isless(t2, 0.0f) || std::isgreater(t2, 1.0f))
+    {
+        return false;
+    }
+    // Calculate crossing point and reflection point
+    cp= as + (v1 * t1);
+    rp = v1.reflectionV(v2.perpendicularV().normalizeV()) * (1.0f - t1) + cp;
+
+    return true;
+}
+/// @}
 
 #if defined(GOBLIB_CPP17_OR_LATER)
 /// @name  Template specialization

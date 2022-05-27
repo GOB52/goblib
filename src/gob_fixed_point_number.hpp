@@ -14,6 +14,10 @@
 #include <algorithm>
 #include <type_traits>
 #include <cassert>
+#ifndef NDEBUG
+#include <bitset>
+#include <string>
+#endif
 #include "gob_math.hpp"
 #include "gob_macro.hpp"
 
@@ -215,19 +219,15 @@ template<typename BT, std::size_t Fraction> class FixedPointNumber
     /// @}
     
 #ifndef NDEBUG
+    /*! for debug 
+      String of bit image.
+     */
     const char* str() const
     {
-        static char sbuf[sizeof(BT)*8+1];
-        auto p = sbuf + sizeof(sbuf) - 1;
-        *p-- = '\0';
-        typename std::make_unsigned<BT>::type v = _value;
-        while(v)
-        {
-            *p-- = '0' + (v&1);
-            v /= 2;
-        }
-        assert(p + 1 >= sbuf);
-        return p + 1;
+        static std::string sss;
+        std::bitset<sizeof(BT)*8> sb(_value);
+        sss = sb.to_string();
+        return sss.c_str();
     }
 #endif
     
