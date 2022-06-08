@@ -8,6 +8,10 @@
 #define GOBLIB_PCM_STREAM_HPP
 
 #include "gob_stream.hpp"
+#ifdef min
+#undef min
+#endif
+#include <algorithm> // std::min
 
 namespace goblib
 {
@@ -76,24 +80,29 @@ class PcmStream
   public:
     PcmStream() : PcmStream(nullptr) {}
     explicit PcmStream(Stream* s)
-            : _stream(s), _format{0,0,0,0,0,0,0,0}, _dataHead(0), _dataSize(0)
+            : _stream(s), _format{}, _dataHead(0), _dataTail(0), _dataSize(0)
     {
         if(s) { fetch(); }
     }
 
     bool assign(Stream* s)
     {
-        _stream = s;
-        return fetch();
+        if(s)
+        {
+            _stream = s;
+            return fetch();
+        }
+        return false;
     }
 
     /// @name Property
     /// @{
-    bool valid() const { return _stream && _dataHead && _dataSize; }
+    bool valid() const { return _stream && _dataHead && _dataTail && _dataSize; }
     Stream::pos_type head() const { return _dataHead; }
+    Stream::pos_type tail() const { return _dataTail; }
     Stream::pos_type position() const { return valid() ? _stream->position() : 0; }
     std::size_t dataSize() const { return _dataSize; }
-    bool is_tail() const { return valid() && _stream->is_tail(); }
+    bool is_tail() const { return valid() && _stream->position() >= _dataTail; }
     /// @}
 
     /// @name Property of PCM
@@ -114,7 +123,12 @@ class PcmStream
     /*! @brief Rewind to head of data. */
     bool rewind() { return valid() ? _stream->seek(_dataHead, goblib::seekdir::beg) : false; }
     /*! @brief Seek data offset */
-    bool seek(std::size_t doff) { return valid() ? _stream->seek(_dataHead + doff, goblib::seekdir::beg) : false; }
+    bool seek(std::size_t doff)
+    {
+        if(!valid()) { return false; }
+        doff = std::min(_dataSize, doff);
+        return _stream->seek(_dataHead + doff, goblib::seekdir::beg);
+    }
     /// @}
 
   protected:
@@ -123,7 +137,7 @@ class PcmStream
   private:
     Stream* _stream;
     wave::fmtSubChunk _format;
-    Stream::pos_type _dataHead;
+    Stream::pos_type _dataHead, _dataTail;
     std::size_t _dataSize;
 };
 
