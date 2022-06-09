@@ -11,8 +11,7 @@ namespace goblib
 
 bool PcmStream::fetch()
 {
-    _dataHead = 0;
-    _dataSize = 0;
+    _dataHead = _dataTail = _dataSize = 0;
     if(!_stream || !_stream->is_open()) { return false; }
 
     _stream->seek(0, goblib::seekdir::beg);
@@ -51,24 +50,20 @@ bool PcmStream::fetch()
     wave::SubChunk sub;
     for(;;)
     {
-        if(_stream->read(&sub, sizeof(sub)) != sizeof(sub))
-        {
-            return false;
-        }
-
+        if(_stream->read(&sub, sizeof(sub)) != sizeof(sub)) { return false; }
         if(sub.identifier == wave::SubChunk::DATA) { break; } // "data"
-
-        if(!_stream->seek(sub.size, goblib::seekdir::cur))
-        {
-            return false;
-        }
+        if(!_stream->seek(sub.size, goblib::seekdir::cur)) { return false; }
     }
 
-    // Head of PCM and size.
-    _dataHead = _stream->position();
-    _dataSize = sub.size;
-
-    return true;
+    if(sub.identifier == wave::SubChunk::DATA)
+    {
+        // Head of PCM and size.
+        _dataHead = _stream->position();
+        _dataSize = sub.size;
+        _dataTail = _dataHead + _dataSize;
+        return true;
+    }
+    return false;;
 }
 
 //
