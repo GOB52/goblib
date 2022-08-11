@@ -9,9 +9,11 @@
 #ifndef GOBLIB_ELLIPSE2D_HPP
 #define GOBLIB_ELLIPSE2D_HPP
 
-#include "gob_shape2d.hpp"
-#include "gob_fixed_point_number.hpp"
 #include "gob_macro.hpp"
+#include "gob_math.hpp"
+#include "gob_fixed_point_number.hpp"
+#include "gob_point2d.hpp"
+
 #include <cmath> // std::sin,cos
 #include <utility> // std::pair
 
@@ -21,11 +23,13 @@ namespace goblib { namespace shape2d {
   @brief Ellipse
   @tparam T coordinate type
 */
-template<typename T> class Ellipse : public Shape<T>
+template<typename T> class Ellipse
 {
     static_assert(goblib::is_fixed_point_number<T>::value || std::is_arithmetic<T>::value, "T must be arithmetic type");
 
   public:
+    using pos_type = T;
+
     constexpr Ellipse() : _center(T(0), T(0)), _radius{T(0), T(0)}, _rotate(0.0f) {}
     constexpr Ellipse(const T& cx, const T& cy, const T& radiusH, const T& radiusV, const float rotate = 0.0f)
             : _center(cx,cy), _radius{radiusH, radiusV}, _rotate(rotate) {}
@@ -62,23 +66,20 @@ template<typename T> class Ellipse : public Shape<T>
          */
     }
 
-    /// @name Override
-    /// @{
-    GOBLIB_INLINE virtual void zero() override
+    GOBLIB_INLINE void zero()
     {
         _center = Point<T>();
         _rotate = 0.0f;
         _radius[0] = _radius[1] = T(0);
     }
-    GOBLIB_INLINE virtual void move(const T& mx, const T& my) override
+    GOBLIB_INLINE void move(const T& mx, const T& my)
     {
         _center = Point<T>(mx, my);
     }
-    GOBLIB_INLINE virtual void offset(const T& ox, const T& oy) override
+    GOBLIB_INLINE void offset(const T& ox, const T& oy)
     {
         _center += Point<T>(ox, oy);
     }
-    /// @}
     
   protected:
     Point<T> _center;
@@ -90,11 +91,13 @@ template<typename T> class Ellipse : public Shape<T>
   @brief Cirlcle
   @tparam T coordinate type
 */
-template<typename T> class Circle : public Shape<T>
+template<typename T> class Circle
 {
     static_assert(goblib::is_fixed_point_number<T>::value || std::is_arithmetic<T>::value, "T must be arithmetic type");
 
   public:
+    using pos_type = T;
+
     constexpr Circle() : Circle(T(0),T(0),T(0)) {}
     constexpr Circle(const T& cx, const T& cy, const T& radius)
             : _center(cx,cy), _radius(radius) {}
@@ -128,22 +131,19 @@ template<typename T> class Circle : public Shape<T>
         */
     }
 
-    /// @name Override
-    /// @{
-    GOBLIB_INLINE virtual void zero() override
+    GOBLIB_INLINE virtual void zero()
     {
         _center = Point<T>();
         _radius = T(0);
     }
-    GOBLIB_INLINE virtual void move(const T& mx, const T& my) override
+    GOBLIB_INLINE void move(const T& mx, const T& my) 
     {
         _center = Point<T>(mx, my);
     }
-    GOBLIB_INLINE virtual void offset(const T& ox, const T& oy) override
+    GOBLIB_INLINE void offset(const T& ox, const T& oy) 
     {
         _center += Point<T>(ox, oy);
     }
-    /// @}
     
   protected:
     Point<T> _center;

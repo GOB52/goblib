@@ -8,15 +8,17 @@
 #ifndef GOBLIB_VECTOR2D_HPP
 #define GOBLIB_VECTOR2D_HPP
 
+#include "gob_macro.hpp"
+#include "gob_math.hpp"
+#include "gob_fixed_point_number.hpp"
+#include "gob_utility.hpp"
+#include "gob_point2d.hpp"
+
 #include <cstdint>
 #include <cmath>
 #include <limits>
 #include <type_traits>
-#include "gob_shape2d.hpp"
-#include "gob_math.hpp"
-#include "gob_utility.hpp"
-#include "gob_fixed_point_number.hpp"
-#include "gob_macro.hpp"
+
 
 namespace goblib { namespace shape2d {
 /*!
@@ -24,19 +26,21 @@ namespace goblib { namespace shape2d {
   @brief 2D Vector
   @tparam T coordinate type
 */
-template<typename T> class Vector2 : public Shape<T>
+template<typename T> class Vector2
 {
     static_assert(goblib::is_fixed_point_number<T>::value || std::is_arithmetic<T>::value, "T must be arithmetic type");
 
   public:
+    using pos_type = T;
+
     /// @name Constructor
     /// @{
     constexpr Vector2() : _x(0), _y(0) {}
     constexpr Vector2(T x, T y) : _x(x), _y(y) {}
     constexpr Vector2(const Vector2<T>& v) : _x(v._x), _y(v._y) {}
-    constexpr Vector2(const Point<T>& v) : _x(v.x()), _y(v.y()) {}
-    Vector2(Vector2<T>&& o) : _x(o._x), _y(o._y) {/*o.zero();*/ }
-    template<typename U> constexpr Vector2(const Vector2<U>& v) : _x(static_cast<T>(v.x())), _y(static_cast<T>(v.y())) {}
+    explicit constexpr Vector2(const Point<T>& v) : _x(v.x()), _y(v.y()) {}
+    constexpr Vector2(Vector2<T>&& o) : _x(o._x), _y(o._y) {}
+    template<typename U> explicit constexpr Vector2(const Vector2<U>& v) : _x(static_cast<T>(v.x())), _y(static_cast<T>(v.y())) {}
     /// @}
     
     /// @name  Property
@@ -79,16 +83,16 @@ template<typename T> class Vector2 : public Shape<T>
 
     /// @name Check
     /// @{
-    GOBLIB_INLINE constexpr bool valid() const { return std::isfinite(_x) && std::isfinite(_y); }
+    GOBLIB_INLINE GOBLIB_CONSTEXPR_GCC  bool valid() const { return std::isfinite(_x) && std::isfinite(_y); }
     GOBLIB_INLINE constexpr bool perpendicular(const Vector2<T>& v, const T tolerance = Vector2<T>::VECTOR2_EPSILON) const
     {
-        return std::abs(normalizeV().dot(v.normalizeV())) < tolerance;
+        return goblib::math::abs(normalizeV().dot(v.normalizeV())) < tolerance;
     }
     GOBLIB_INLINE constexpr bool parallel(const Vector2<T>& v, const T tolerance = Vector2<T>::VECTOR2_EPSILON) const
     {
-        return std::abs(normalizeV().cross(v.normalizeV())) < tolerance;
+        return goblib::math::abs(normalizeV().cross(v.normalizeV())) < tolerance;
     }
-    GOBLIB_INLINE constexpr bool near(const Vector2<T>& v, const T tolerance = static_cast<T>(0.0001f))
+    GOBLIB_INLINE constexpr bool near(const Vector2<T>& v, const T tolerance = static_cast<T>(0.0001f)) const
     {
         return goblib::math::equal_tolerance(x(), v.x(), tolerance) && goblib::math::equal_tolerance(y(), v.y(), tolerance);
     }
@@ -113,8 +117,8 @@ template<typename T> class Vector2 : public Shape<T>
     {
         return (v - *this).lengthSq();
     }
-    
-    GOBLIB_INLINE constexpr T angle() const
+
+    GOBLIB_INLINE GOBLIB_CONSTEXPR_GCC T angle() const
     {
         return std::atan2(_y, _x);
     }
@@ -208,7 +212,7 @@ template<typename T> class Vector2 : public Shape<T>
     {
         return goblib::math::equal(_x, v._x) && goblib::math::equal(_y, v._y);
     }
-    GOBLIB_INLINE constexpr bool operator!=(const Vector2<T>& v) /*const*/ { return !(*this == v); }
+    GOBLIB_INLINE constexpr bool operator!=(const Vector2<T>& v) const { return !(*this == v); }
     /// @}
     
     /// @name Compound Assignment
@@ -262,41 +266,30 @@ template<typename T> class Vector2 : public Shape<T>
     }
     /// @}
 
-    /// @name Override
-    /// @{
-    GOBLIB_INLINE virtual void zero() override { _x = _y = static_cast<T>(0); }
-    GOBLIB_INLINE virtual void move(const T& mx, const T& my) override
+    GOBLIB_INLINE void zero() { _x = _y = static_cast<T>(0); }
+    GOBLIB_INLINE void move(const T& mx, const T& my)
     {
         _x = mx;
         _y = my;
     }
-    GOBLIB_INLINE virtual void offset(const T& ox, const T& oy) override
+    GOBLIB_INLINE void offset(const T& ox, const T& oy)
     {
         _x += ox;
         _y += oy;
     }
-    /// @}
 
-#if defined(GOBLIB_CPP17_OR_LATER)
-    constexpr static Vector2<T> X_AXIS = Vector2<T>(1, 0); //!< X axis.
-    constexpr static Vector2<T> Y_AXIS = Vector2<T>(0, 1); //!< Y axis.
-    constexpr static Vector2<T> ZERO_VECTOR = Vector2<T>(0, 0); //!< Zero vector
-#else
     static const Vector2<T> X_AXIS;
     static const Vector2<T> Y_AXIS;
     static const Vector2<T> ZERO_VECTOR;
-#endif
     
   private:
     T _x, _y;
     constexpr static T VECTOR2_EPSILON = std::numeric_limits<T>::epsilon();
 };
 
-#if defined(GOBLIB_CPP14_OR_EARLIER)
 template<typename T> const Vector2<T> Vector2<T>::X_AXIS = Vector2<T>(1, 0); //!< X axis.
 template<typename T> const Vector2<T> Vector2<T>::Y_AXIS = Vector2<T>(0, 1); //!< Y axis.
 template<typename T> const Vector2<T> Vector2<T>::ZERO_VECTOR = Vector2<T>(0, 0); //!< Zero vector
-#endif
 
 /// @name Arithmetic
 /// @{
@@ -410,11 +403,11 @@ bool reflect(const Vector2<T>& as, const Vector2<T>& ae, const Vector2<T>& bs, c
 #if defined(GOBLIB_CPP17_OR_LATER)
 /// @name  Template specialization
 /// @{
-template<>  GOBLIB_INLINE constexpr
+template<>  GOBLIB_INLINE GOBLIB_CONSTEXPR_GCC
 float Vector2<float>::angle() const { return ::atan2f(_y, _x); } // Using atan2f() if float.
-template<>  GOBLIB_INLINE constexpr
+template<>  GOBLIB_INLINE GOBLIB_CONSTEXPR_GCC
 double Vector2<double>::angle() const { return std::atan2(_y, _x); } // Using atan2() if double.
-template<>  GOBLIB_INLINE constexpr
+template<>  GOBLIB_INLINE GOBLIB_CONSTEXPR_GCC
 long double Vector2<long double>::angle() const { return ::atan2l(_y, _x); } // Using atan2l() if long double.
 /// @}
 #endif

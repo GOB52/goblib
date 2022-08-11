@@ -3,6 +3,7 @@
 
   @file   gob_easing.hpp
   @brief  Easing
+  @todo Convert some non-constexpr functions to constexpr.
 */
 #pragma once
 #ifndef GOBLIB_EASING_HPP
@@ -100,32 +101,56 @@ GOBLIB_INLINE constexpr float quintic_inout(const float t)
         0.5f * ((t * 2.0f - 2.0f) * (t * 2.0f - 2.0f) * (t * 2.0f - 2.0f) * (t * 2.0f - 2.0f) * (t * 2.0f - 2.0f) + 2.0f);
 }
 
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float sinusoidal_in(const float t)
+#else
+GOBLIB_INLINE float sinusoidal_in(const float t)
+#endif
 {
     return -1.0f * std::cos(t * math::constants::half_pi_f) + 1.0f;
 }
 
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float sinusoidal_out(const float t)
+#else
+GOBLIB_INLINE float sinusoidal_out(const float t)
+#endif
 {
     return 1.0f * std::sin(t * math::constants::half_pi_f);
 }
 
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float sinusoidal_inout(const float t)
+#else
+GOBLIB_INLINE float sinusoidal_inout(const float t)
+#endif
 {
     return -0.5f * (std::cos(t * math::constants::pi_f) - 1.0f);
 }
 
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float exponential_in(const float t)
+#else
+GOBLIB_INLINE float exponential_in(const float t)
+#endif
 {
     return (t == 0.0f) ? 0.0f : 1.0f * std::pow(2.0f, 10.0f * (t - 1.0f));
 }
 
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float exponential_out(const float t)
+#else
+GOBLIB_INLINE float exponential_out(const float t)
+#endif
 {
     return (t == 1.0f) ? 1.0f : 1.0f * (-std::pow(2.0f, -10.0f * t) + 1.0f);
 }
 
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float exponential_inout(const float t)
+#else
+GOBLIB_INLINE float exponential_inout(const float t)
+#endif
 {
     return (t == 0.0f) ? 0.0f :
         (t == 1.0f) ? 1.0f :
@@ -134,17 +159,29 @@ GOBLIB_INLINE constexpr float exponential_inout(const float t)
         0.5f * (-std::pow(2.0f, -10.0f * (t * 2.0f - 1.0f)) + 2.0f);
 }
 
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float circular_in(const float t)
+#else
+GOBLIB_INLINE float circular_in(const float t)
+#endif
 {
     return -1.0f * (std::sqrt(1.0f - t * t) - 1.0f);
 }
 
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float circular_out(const float t)
+#else
+GOBLIB_INLINE  float circular_out(const float t)
+#endif
 {
     return 1.0f * std::sqrt(1.0f - (t - 1.0f) * (t - 1.0f));
 }
 
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float circular_inout(const float t)
+#else
+GOBLIB_INLINE float circular_inout(const float t)
+#endif
 {
     return (t * 2.0f) < 1.0f ?
         -0.5f * (std::sqrt(1.0f - (t * 2.0f) * (t * 2.0f)) - 1.0f) :
@@ -178,21 +215,33 @@ namespace
 constexpr float ElasticFactor = math::constants::pi2_f / 3.0f;
 constexpr float ElasticFactor2 = math::constants::pi2_f / 4.5f;
 }
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float elastic_in(const float t)
+#else
+GOBLIB_INLINE float elastic_in(const float t)        
+#endif
 {
     return (t <= 0.0f) ? 0.0f :
         (t >= 1.0f) ? 1.0f :
         -std::pow(2.0f, 10.0f * t - 10.0f) * std::sin((t * 10.0f - 10.75f) * ElasticFactor);
 }
 
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float elastic_out(const float t)
+#else
+GOBLIB_INLINE float elastic_out(const float t)
+#endif
 {
     return (t <= 0.0f) ? 0.0f :
         (t >= 1.0f) ? 1.0f :
         std::pow(2.0f, -10.0f * t) * std::sin((t * 10.0f - 0.75f) * ElasticFactor) + 1.0f;
 }
 
+#if defined(__GNUG__) && !defined(__clang__)
 GOBLIB_INLINE constexpr float elastic_inout(const float t)
+#else
+GOBLIB_INLINE float elastic_inout(const float t)
+#endif
 {
     return (t <= 0.0f) ? 0.0f :
         (t >= 1.0f) ? 1.0f :
@@ -208,35 +257,21 @@ constexpr float BounceFactor2 = 7.5625f;
 }
 GOBLIB_INLINE constexpr float bounce_out(const float t)
 {
-#if 1
     return t < (1.0f / BounceFactor) ? BounceFactor2 * t * t :
         t < (2.0f / BounceFactor) ? BounceFactor2 * (t - (1.5f / BounceFactor)) * (t - (1.5f / BounceFactor)) + 0.75f :
         t < (2.5f / BounceFactor) ? BounceFactor2 * (t - (2.25f / BounceFactor)) * (t- (2.25f / BounceFactor)) + 0.9375f :
         BounceFactor2 * (t - (2.625f / BounceFactor)) * (t - (2.625f / BounceFactor)) + 0.984375f;
-#else
-    return 1.0f - std::pow(2.0f, -6.0f * t ) * std::abs(std::cos( t * goblib::math::constants::pi_f * 3.5f ) );
-#endif
 }
 
 GOBLIB_INLINE constexpr float bounce_in(const float t)
 {
-#if 1
     return 1.0f - bounce_out(1.0f - t);
-#else
-    return std::pow(2.0f, 6.0f * (t - 1.0f) ) * std::abs(std::sin(t * goblib::math::constants::pi_f * 3.5f ) );
-#endif
 }
 
 GOBLIB_INLINE constexpr float bounce_inout(const float t)
 {
-#if 1
     return t < 0.5f ? (1.0f - bounce_out(1.0f - 2.0f * t)) * 0.5f
             :  (1.0f + bounce_out(2.0f * t - 1.0f)) * 0.5f;
-#else
-    return (t < 0.5f) ?
-        8.0f * std::pow(2.0f, 8.0f * (t - 1.0f) ) * std::abs(std::sin(t * goblib::math::constants::pi_f * 7.0f ) ) :
-        1.0f - 8.0f * std::pow(2.0f, -8.0f * t )  * std::abs(std::sin(t * goblib::math::constants::pi_f * 7.0f ) );
-#endif
 }
 /// @}
 
@@ -260,25 +295,49 @@ struct easing_quintic_in        { GOBLIB_INLINE constexpr float operator()(const
 struct easing_quintic_out       { GOBLIB_INLINE constexpr float operator()(const float t) const { return quintic_out(t); } };
 struct easing_quintic_inout     { GOBLIB_INLINE constexpr float operator()(const float t) const { return quintic_inout(t); } };
 
+#if defined(__GNUG__) && !defined(__clang__)
 struct easing_sinusoidal_in     { GOBLIB_INLINE constexpr float operator()(const float t) const { return sinusoidal_in(t); } };
 struct easing_sinusoidal_out    { GOBLIB_INLINE constexpr float operator()(const float t) const { return sinusoidal_out(t); } };
 struct easing_sinusoidal_inout  { GOBLIB_INLINE constexpr float operator()(const float t) const { return sinusoidal_inout(t); } };
+#else
+struct easing_sinusoidal_in     { GOBLIB_INLINE float operator()(const float t) const { return sinusoidal_in(t); } };
+struct easing_sinusoidal_out    { GOBLIB_INLINE float operator()(const float t) const { return sinusoidal_out(t); } };
+struct easing_sinusoidal_inout  { GOBLIB_INLINE float operator()(const float t) const { return sinusoidal_inout(t); } };
+#endif
 
+#if defined(__GNUG__) && !defined(__clang__)
 struct easing_exponential_in    { GOBLIB_INLINE constexpr float operator()(const float t) const { return exponential_in(t); } };
 struct easing_exponential_out   { GOBLIB_INLINE constexpr float operator()(const float t) const { return exponential_out(t); } };
 struct easing_exponential_inout { GOBLIB_INLINE constexpr float operator()(const float t) const { return exponential_inout(t); } };
+#else
+struct easing_exponential_in    { GOBLIB_INLINE float operator()(const float t) const { return exponential_in(t); } };
+struct easing_exponential_out   { GOBLIB_INLINE float operator()(const float t) const { return exponential_out(t); } };
+struct easing_exponential_inout { GOBLIB_INLINE float operator()(const float t) const { return exponential_inout(t); } };
+#endif
 
+#if defined(__GNUG__) && !defined(__clang__)
 struct easing_circular_in       { GOBLIB_INLINE constexpr float operator()(const float t) const { return circular_in(t); } };
 struct easing_circular_out      { GOBLIB_INLINE constexpr float operator()(const float t) const { return circular_out(t); } };
 struct easing_circular_inout    { GOBLIB_INLINE constexpr float operator()(const float t) const { return circular_inout(t); } };
+#else
+struct easing_circular_in       { GOBLIB_INLINE float operator()(const float t) const { return circular_in(t); } };
+struct easing_circular_out      { GOBLIB_INLINE float operator()(const float t) const { return circular_out(t); } };
+struct easing_circular_inout    { GOBLIB_INLINE float operator()(const float t) const { return circular_inout(t); } };
+#endif
 
 struct easing_back_in           { GOBLIB_INLINE constexpr float operator()(const float t) const { return back_in(t); } };
 struct easing_back_out          { GOBLIB_INLINE constexpr float operator()(const float t) const { return back_out(t); } };
 struct easing_back_inout        { GOBLIB_INLINE constexpr float operator()(const float t) const { return back_inout(t); } };
 
+#if defined(__GNUG__) && !defined(__clang__)
 struct easing_elastic_in        { GOBLIB_INLINE constexpr float operator()(const float t) const { return elastic_in(t); } };
 struct easing_elastic_out       { GOBLIB_INLINE constexpr float operator()(const float t) const { return elastic_out(t); } };
 struct easing_elastic_inout     { GOBLIB_INLINE constexpr float operator()(const float t) const { return elastic_inout(t); } };
+#else
+struct easing_elastic_in        { GOBLIB_INLINE float operator()(const float t) const { return elastic_in(t); } };
+struct easing_elastic_out       { GOBLIB_INLINE float operator()(const float t) const { return elastic_out(t); } };
+struct easing_elastic_inout     { GOBLIB_INLINE float operator()(const float t) const { return elastic_inout(t); } };
+#endif
 
 struct easing_bounce_in         { GOBLIB_INLINE constexpr float operator()(const float t) const { return bounce_in(t); } };
 struct easing_bounce_out        { GOBLIB_INLINE constexpr float operator()(const float t) const { return bounce_out(t); } };

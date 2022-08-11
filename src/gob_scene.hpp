@@ -41,11 +41,11 @@ class SceneTask : public goblib::Task
       @param pre Previous current scene.
       @param resume true:Resume false:First time
     */
-    virtual void onEnterCurrentScene(SceneType pre, bool resume){}
+    virtual void onEnterCurrentScene(SceneType pre, bool resume){(void)pre, (void)resume; }
     /*! @brief Function will be called when to be no longer current scene.
       @param cur SceneType that to be current.
     */
-    virtual void onLeaveCurrentScene(SceneType cur){}
+    virtual void onLeaveCurrentScene(SceneType cur){ (void)cur; }
     /// @}
  
   private:
@@ -64,7 +64,9 @@ class SceneManageTask : public goblib::Task
   public:
     SceneManageTask(goblib::TaskTree<goblib::Task>& tree, goblib::Task::PriorityType pri, goblib::Task* parent = nullptr);
     virtual~ SceneManageTask(){}
-        
+
+    goblib::Task* parent() { return _parent; }
+    
     void push(SceneTask* st);
     void pop();
 
@@ -73,7 +75,7 @@ class SceneManageTask : public goblib::Task
   protected:
     virtual bool onRelease() override;
     /*! @brief Called when scene has been changed. */
-    virtual void onChangeScene(SceneTask::SceneType to, SceneTask::SceneType from){}
+    virtual void onChangeScene(SceneTask::SceneType to, SceneTask::SceneType from){ (void)to, (void)from; }
 
   private:
     goblib::TaskTree<goblib::Task>& _tree;

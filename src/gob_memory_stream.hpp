@@ -69,7 +69,7 @@ class MemoryStream : public Stream
 
     /// @name Property
     /// @{
-    virtual pos_type size() const { return _tail - _head; }
+    virtual pos_type size() const override { return _tail - _head; }
     /// @}
     
     /// @name Read

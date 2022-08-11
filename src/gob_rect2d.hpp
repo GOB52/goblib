@@ -8,14 +8,11 @@
 #ifndef GOBLIB_RECT2D_HPP
 #define GOBLIB_RECT2D_HPP
 
-#ifdef min
-#undef min
-#endif
-
-#include "gob_shape2d.hpp"
+#include "gob_macro.hpp"
 #include "gob_math.hpp"
 #include "gob_fixed_point_number.hpp"
-#include "gob_macro.hpp"
+#include "gob_point2d.hpp"
+
 #include <limits> // numeric_limits
 #include <algorithm> // std::min.max
 #include <type_traits> // std::is_integral,...
@@ -29,20 +26,21 @@ namespace goblib { namespace shape2d {
   @brief 2D Rectangle.
   @tparam T type of value.
 */
-template<typename T>
-class Rectangle : public Shape <T>
+template<typename T> class Rectangle
 {
     static_assert(goblib::is_fixed_point_number<T>::value || std::is_arithmetic<T>::value, "T must be arithmetic type");
 
   public:
+    using pos_type = T;
+
     /// @name Constructor
     /// @{
     constexpr Rectangle() : Rectangle(T(0),T(0),T(0),T(0)) {}
     constexpr Rectangle(T x, T y, T w, T h) : _pos(x,y), _w(w), _h(h) {}
-    constexpr Rectangle(const Point<T>& pos, const T& w, const T& h) : _pos(pos), _w(w), _h(w) {}
+    constexpr Rectangle(const Point<T>& pos, const T& w, const T& h) : _pos(pos), _w(w), _h(h) {}
     constexpr Rectangle(const Point<T>& lt, const Point<T>& rb) : _pos(lt), _w(rb.x() - lt.x() + (T)1), _h(rb.y() - lt.y() + (T)1) {}
     constexpr Rectangle(const Rectangle<T>& o) : _pos(o._pos), _w(o._w), _h(o._h) {}
-    Rectangle(Rectangle<T>&& o) : _pos(o._pos), _w(o._w), _h(o._h) { o.zero(); }
+    constexpr Rectangle(Rectangle<T>&& o) : _pos(o._pos), _w(o._w), _h(o._h) {}
     /// @}
 
     /// @name Assignment
@@ -90,7 +88,7 @@ class Rectangle : public Shape <T>
     constexpr GOBLIB_INLINE bool empty() const { return _w <= T(0) || _h <= T(0); }
     constexpr GOBLIB_INLINE bool valid() const { return !empty() && !(_pos.x() > std::numeric_limits<T>::max() - _w) && !(_pos.y() > std::numeric_limits<T>::max() - _h); }
 
-    constexpr GOBLIB_INLINE bool contains(const Point<T>& pos) { return contains(pos.x(), pos.y()); }
+    constexpr GOBLIB_INLINE bool contains(const Point<T>& pos) const { return contains(pos.x(), pos.y()); }
     constexpr GOBLIB_INLINE bool contains(T x, T y) const
     {
         return valid() &&
@@ -159,24 +157,21 @@ class Rectangle : public Shape <T>
     GOBLIB_INLINE void offset(const Point<T>& off) { offset(off.x(), off.y()); }
     GOBLIB_INLINE void inflate(const T& w, const T& h) { _w = w; _h = h; }
     /// @}
-    
-    /// @name Override
-    /// @{
-    GOBLIB_INLINE virtual void zero() override
+
+    GOBLIB_INLINE void zero() 
     {
         _pos = Point<T>(); _w = _h = T(0);
     }
 
-    GOBLIB_INLINE virtual void move(const T& mx, const T& my) override
+    GOBLIB_INLINE void move(const T& mx, const T& my) 
     {
         _pos.move(mx, my);
     }
 
-    GOBLIB_INLINE virtual void offset(const T& ox, const T& oy) override
+    GOBLIB_INLINE void offset(const T& ox, const T& oy) 
     {
         _pos.offset(ox, oy);
     }
-    /// @}
     
   protected:
     Point<T> _pos;  //!< left top.

@@ -108,7 +108,7 @@ template<class T> class FamilyTree
         std::size_t sz = 0;
         if(top)
         {
-            ConstCallback f = [&sz](const T* c){ ++sz; };
+            ConstCallback f = [&sz](const T*){ ++sz; };
             callback(f, top);
         }
         return sz;
@@ -138,14 +138,14 @@ template<class T> class FamilyTree
         this->callback(func, const_cast<T*>(root()));
     }
                 
-    template<class U, typename std::enable_if<std::is_base_of<T, U>::value, nullptr_t>::type = nullptr>
+    template<class U, typename std::enable_if<std::is_base_of<T, U>::value, std::nullptr_t>::type = nullptr>
     void callback(Callback func, U* start)
     {
         static_assert(goblib::template_helper::is_callable<decltype(func), T*>::value, "func isnot callable.");
         static_cast<const FamilyTree&>(*this).callback(func, start);
     }
 
-    template<class U, typename std::enable_if<std::is_base_of<T, U>::value, nullptr_t>::type = nullptr>
+    template<class U, typename std::enable_if<std::is_base_of<T, U>::value, std::nullptr_t>::type = nullptr>
     void callback(Callback func, U* start) const
     {
         static_assert(goblib::template_helper::is_callable<decltype(func), T*>::value, "func isnot callable.");

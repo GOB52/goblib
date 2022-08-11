@@ -10,61 +10,83 @@
 #define GOBLIB_MACRO_HPP
 /// @endcond
 
+/// @name Compiler detection
+/// @{
+#if !defined(DOXYGEN_PROCESS)
+#  if defined(__clang__)
+#    define GOBLIB_COMPILER_CLANG
+#  elif defined(_MSC_VER)
+#    define GOBLIB_COMPILER_MSC
+#  elif defined(__BORLANDC__)
+#    define GOBLIB_COMPILER_BCC
+#  elif defined(__MINGW32__) || defined(__MINGW64__)
+#    define GOBLIB_COMPILER_MINGW
+#  elif defined(__INTEL_COMPILER)
+#    define GOBLIB_COMPILER_ICC
+#  elif defined(__GNUG__)
+#    define GOBLIB_COMPILER_GCC
+#  else
+#    define GOBLIB_COMPILER_UNKNOWN
+#  endif
+#else
+/*! @brief defined if using Clang */
+#define GOBLIB_COMPILER_CLANG
+/*! @brief defined if using Microsoft C++ */
+#define GOBLIB_COMPILER_MSC
+/*! @brief defined if using Borland C++ */
+#define GOBLIB_COMPILER_BCC
+/*! @brief defined if using MinGW */
+#define GOBLIB_COMPILER_MINGW
+/*! @brief defined if using Intel compiler */
+#define GOBLIB_COMPILER_ICC
+/*! @brief defined if using GCC */
+#define GOBLIB_COMPILER_GCC
+/*! @brief defined if using unknown compiler */
+#define GOBLIB_COMPILER_UNKNOWN
+#endif
+/// @}
+
+#if defined(GOBLIB_COMPILER_GCC) || defined(DOXYGEN_PROCESS)
+/*! @brief To be constexpr only compiled with GCC */
+#  define GOBLIB_CONSTEXPR_GCC constexpr
+#else
+#  define GOBLIB_CONSTEXPR_GCC
+#endif
+
 /// @name C++ Version detection
 /// @{
 #if __cplusplus >= 201103L || defined(DOXYGEN_PROCESS)
-/*! 
-  @def GOBLIB_CPP11_OR_LATER
-  @brief defined if C++11 or later
-*/
+/*!  @brief defined if C++11 or later */
 #define GOBLIB_CPP11_OR_LATER
 #endif
 
 #if __cplusplus >= 201402L || defined(DOXYGEN_PROCESS)
-/*! 
-  @def GOBLIB_CPP14_OR_LATER
-  @brief defined if C++14 or later
-*/
+/*! @brief defined if C++14 or later */
 #define GOBLIB_CPP14_OR_LATER
 #endif
 
 #if __cplusplus >= 201703L || defined(DOXYGEN_PROCESS)
-/*! 
-  @def GOBLIB_CPP17_OR_LATER
-  @brief defined if C++17 or later
-*/
+/*! @brief defined if C++17 or later */
 #define GOBLIB_CPP17_OR_LATER
 #endif
 
 #if __cplusplus >= 202002L || defined(DOXYGEN_PROCESS)
-/*! 
-  @def GOBLIB_CPP20_OR_LATER
-  @brief defined if C++20 or later
-*/
+/*! @brief defined if C++20 or later */
 #define GOBLIB_CPP20_OR_LATER
 #endif
 
 #if __cplusplus < 201402L || defined(DOXYGEN_PROCESS)
-/*! 
-  @def GOBLIB_CPP11_OR_EARLIER
-  @brief defined if C++11 and prior
-*/
+/*! @brief defined if C++11 or earlier */
 #define GOBLIB_CPP11_OR_EARLIER
 #endif
 
 #if __cplusplus < 201703L || defined(DOXYGEN_PROCESS)
-/*! 
-  @def GOBLIB_CPP14_OR_EARLIER
-  @brief defined if C++14 and prior
-*/
+/*! @brief defined if C++14 or earlier */
 #define GOBLIB_CPP14_OR_EARLIER
 #endif
 
 #if __cplusplus < 202002L || defined(DOXYGEN_PROCESS)
-/*! 
-  @def GOBLIB_CPP17_OR_EARLIER
-  @brief defined if C++17 and prior
-*/
+/*! @brief defined if C++17 or earlier */
 #define GOBLIB_CPP17_OR_EARLIER
 #endif
 
@@ -72,15 +94,15 @@
 #ifdef GOBLIB_CPP_VERSION_DETECTION
 
 #if defined(GOBLIB_CPP11_OR_LATER) && defined(GOBLIB_CPP11_OR_EARLIER)
-#pragma message "C++11"
+  #pragma message "C++11"
 #elif defined(GOBLIB_CPP14_OR_LATER) && defined(GOBLIB_CPP14_OR_EARLIER)
-#pragma message "C++14"
+  #pragma message "C++14"
 #elif defined(GOBLIB_CPP17_OR_LATER) && defined(GOBLIB_CPP17_OR_EARLIER)
-#pragma message "C++17"
+  #pragma message "C++17"
 #elif defined(GOBLIB_CPP20_OR_LATER)
-#pragma message "C++20 or later"
+  #pragma message "C++20 or later"
 #else
-#error "Unable to determine CPP version or C++03 or earlier."
+  #error "Unable to determine CPP version or C++03 or earlier."
 #endif
 
 #endif
@@ -199,6 +221,14 @@
 #endif
 
 #endif
+
+#if defined(__GNUC__)
+#define GOBLIB_WEAK     __attribute__((weak))
+#else
+#define GOBLIB_WEAK     /* nop */
+#endif
+
+
 /// @}
 
 #endif
