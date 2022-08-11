@@ -13,3 +13,6 @@ C++11以降をコンパイルできる環境下での使用を想定していま
 [Doxygen](http://www.doxygen.jp/) によりライブラリドキュメントを生成できます。 [Doxygen設定ファイル](doc/Doxyfile)  
 出力する際に [doxy.sh](doc/doxy.sh) を使用すると、library.properties からVersion、repository から rev を取得し、Doxygen 出力できます。
 
+## GoogleTest(Native) by PlatformIO
+platform.ini を開き、Advanced - Test で PlatformIO 上での GoogleTest が実行できます。
+
