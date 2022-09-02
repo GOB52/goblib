@@ -421,7 +421,8 @@ template<typename T> constexpr GOBLIB_INLINE bool is_powerof2(const T v)
 template<typename T, typename std::enable_if< std::is_arithmetic<T>::value, std::nullptr_t>::type = nullptr>
 constexpr GOBLIB_INLINE T sign(const T v)
 {
-    return static_cast<T>((T(0) < v) - (v < T(0)));
+    return (v != v) ? 0 // unordered (may be v is NaN)
+            : static_cast<T>((T(0) < v) - (v < T(0)));
 }
 
 /// @cond
