@@ -105,6 +105,8 @@ class App
     }
     /// @}
 
+    GOBLIB_INLINE std::chrono::time_point<Clock, UpdateDuration> absTime() const { return _last + _updateTick; }
+    
   private:
     const UpdateDuration _updateTick;
     const UpdateDuration _fixedUpdateTick;
@@ -117,10 +119,8 @@ class App
     constexpr static float MAX_DELTA = 4.0f;
 };
 
-template<class Clock, std::uint32_t UFPS, std::uint32_t FFPS>
-constexpr float App<Clock, UFPS, FFPS>::MIN_DELTA;
-template<class Clock, std::uint32_t UFPS, std::uint32_t FFPS>
-constexpr float App<Clock, UFPS, FFPS>::MAX_DELTA;
+template<class Clock, std::uint32_t UFPS, std::uint32_t FFPS> constexpr float App<Clock, UFPS, FFPS>::MIN_DELTA;
+template<class Clock, std::uint32_t UFPS, std::uint32_t FFPS> constexpr float App<Clock, UFPS, FFPS>::MAX_DELTA;
 
 //
 }

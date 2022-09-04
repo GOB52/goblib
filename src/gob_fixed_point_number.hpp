@@ -20,6 +20,7 @@
 #endif
 #include "gob_math.hpp"
 #include "gob_macro.hpp"
+#include "gob_utility.hpp"
 
 namespace goblib
 {
@@ -35,19 +36,17 @@ template<typename BT, std::size_t Fraction> class FixedPointNumber
     static_assert(Fraction > 0, "Fraction must be greater than zero");
     static_assert(Fraction <= sizeof(BT) * 8, "Fractional bits must be less than or equal to the number of bits in T");
 
-    template<typename T> struct BitsBeyondSpecification
+    // Get the next large Int type
+    template<typename T> struct NextInteger
     {
-        template<typename U, typename std::enable_if< std::is_signed<U>::value && (std::numeric_limits<int16_t>::digits > std::numeric_limits<U>::digits), std::nullptr_t>::type = nullptr> int16_t static foo() { return 0; }
-        template<typename U, typename std::enable_if< std::is_unsigned<U>::value && (std::numeric_limits<uint16_t>::digits > std::numeric_limits<U>::digits), std::nullptr_t>::type = nullptr> static  uint16_t foo() { return 0; }
-        template<typename U, typename std::enable_if< std::is_signed<U>::value && (std::numeric_limits<int32_t>::digits > std::numeric_limits<U>::digits) &&  (std::numeric_limits<U>::digits > std::numeric_limits<std::int8_t>::digits) , std::nullptr_t>::type = nullptr> static int32_t foo() { return 0; }
-        template<typename U, typename std::enable_if< std::is_unsigned<U>::value && (std::numeric_limits<uint32_t>::digits > std::numeric_limits<U>::digits) &&  (std::numeric_limits<U>::digits > std::numeric_limits<std::uint8_t>::digits) , std::nullptr_t>::type = nullptr> static uint32_t foo() { return 0; }
-        template<typename U, typename std::enable_if< std::is_signed<U>::value && (std::numeric_limits<int64_t>::digits > std::numeric_limits<U>::digits) &&  (std::numeric_limits<U>::digits > std::numeric_limits<std::int16_t>::digits) , std::nullptr_t>::type = nullptr> static int64_t foo() { return 0; }
-        template<typename U, typename std::enable_if< std::is_unsigned<U>::value && (std::numeric_limits<uint64_t>::digits > std::numeric_limits<U>::digits) &&  (std::numeric_limits<U>::digits > std::numeric_limits<std::uint16_t>::digits) , std::nullptr_t>::type = nullptr> static uint64_t foo() { return 0; }
+        template<typename U, typename std::enable_if< std::is_signed<U>::value, std::nullptr_t>::type = nullptr>
+        static auto foo() -> typename goblib::int_by_size<sizeof(U) * CHAR_BIT +  1>::type { return 0; }
+        template<typename U, typename std::enable_if< std::is_unsigned<U>::value, std::nullptr_t>::type = nullptr>
+        static auto foo() -> typename goblib::uint_by_size<sizeof(U) * CHAR_BIT + 1>::type { return 0; }
         using type = decltype(foo<T>());
     };
-    /*! @brief Type for used to store intermediate results in calculation */
-    using CalculationType = typename BitsBeyondSpecification<BT>::type;
-
+    using CalculationType = typename NextInteger<BT>::type;
+    
     static_assert(std::numeric_limits<CalculationType>::digits > std::numeric_limits<BT>::digits, "Insufficient number of bits in CalculationType");
     
   public:

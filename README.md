@@ -15,3 +15,6 @@ It depends on your development environment whether or not you need to add an opt
 You can make a document of this library by [Doxygen](https://www.doxygen.nl/)  => [Doxyfile](doc/Doxyfile)  
 In case you use shell script [doxy.sh](doc/doxy.sh), then output version from library.properties, revision from repository.
 
+## GoogleTest(Native) by PlatformIO
+Open platform.ini and launch Advanced - Test.
+

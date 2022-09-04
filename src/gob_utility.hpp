@@ -139,6 +139,41 @@ template <typename T> GOBLIB_INLINE T roundTrip(const T& c, const T& W)
     return ((c & W) + ((c & (W-1)) ^ (0 - ((c >> (std::bitset<32>(W-1).count())) & 1))));
 }
 
+/// @cond
+template <size_t N> struct int_by_size : int_by_size< N + 1 > { };
+template <size_t N> struct uint_by_size : uint_by_size< N + 1 > { };
+/// @endcond
+/*! @brief Integral type from bit size */
+template <size_t N> using int_by_size_t = typename int_by_size< N >::type;
+/*! @brief Unsigned integral type from bit size */
+template <size_t N> using uint_by_size_t = typename uint_by_size< N >::type;
+
+/// @cond
+template <typename T> struct tag { using type = T; };
+template <> struct int_by_size<  8>  : tag<int8_t    > { };
+template <> struct int_by_size< 16>  : tag<int16_t   > { };
+template <> struct int_by_size< 32>  : tag<int32_t   > { };
+template <> struct int_by_size< 64>  : tag<int64_t   > { };
+
+#if (defined(GOBLIB_COMPILER_GCC) || defined(GOBLIB_COMPILER_CLANG)) && defined(__SIZEOF_INT128__)
+template <> struct int_by_size<128> : tag<__int128_t> { };
+# if defined(GOBLIB_ENABLE_PRAGMA_MESSAGE)
+#    pragma  message "Support int128_t"
+# endif
+#endif
+
+template <> struct uint_by_size<  8>  : tag<uint8_t    > { };
+template <> struct uint_by_size< 16>  : tag<uint16_t   > { };
+template <> struct uint_by_size< 32>  : tag<uint32_t   > { };
+template <> struct uint_by_size< 64>  : tag<uint64_t   > { };
+#if (defined(GOBLIB_COMPILER_GCC) || defined(GOBLIB_COMPILER_CLANG)) && defined(__SIZEOF_INT128__)
+template <> struct uint_by_size<128> : tag<__uint128_t> { };
+# if defined(GOBLIB_ENABLE_PRAGMA_MESSAGE)
+#    pragma  message "Support uint128_t"
+# endif
+#endif
+/// @endcond
+
 //
 }
 #endif

@@ -8,9 +8,9 @@
 #ifndef GOBLIB_LINE2D_HPP
 #define GOBLIB_LINE2D_HPP
 
-#include "gob_shape2d.hpp"
 #include "gob_math.hpp"
 #include "gob_macro.hpp"
+#include "gob_point2d.hpp"
 
 namespace goblib { namespace shape2d {
 
@@ -19,18 +19,20 @@ namespace goblib { namespace shape2d {
   LineSegment
   @brief 2D line segment definition.
 */
-template<typename T> class LineSegment : public Shape<T>
+template<typename T> class LineSegment
 {
     static_assert(goblib::is_fixed_point_number<T>::value || std::is_arithmetic<T>::value, "T must be arithmetic type");
 
   public:
+    using pos_type = T;
+
     /// @name Constructor
     /// @{
     constexpr LineSegment() : LineSegment(T(0),T(0),T(0),T(0)) {}
     constexpr LineSegment(const T sx, const T sy, const T ex, const T ey) : _start(sx, sy), _end(ex, ey) {}
     constexpr LineSegment(const Point<T>& s, const Point<T>& e) : _start(s) , _end(e) {}
     constexpr LineSegment(const LineSegment<T>& o) : _start(o._start), _end(o._end) {}
-    LineSegment(LineSegment<T>&& o) : _start(o._start), _end(o._end) { o.zero(); }
+    constexpr LineSegment(LineSegment<T>&& o) : _start(o._start), _end(o._end) {}
     /// @}
 
     /// @name  Property
@@ -84,24 +86,21 @@ template<typename T> class LineSegment : public Shape<T>
     /// @{
     GOBLIB_INLINE explicit operator bool() const { return _start != _end; }
     /// @}
-    
-    /// @name Override
-    /// @{
-    GOBLIB_INLINE virtual void zero() override
+
+    GOBLIB_INLINE void zero()
     {
         _start = _end = Point<T>();
     }
-    GOBLIB_INLINE virtual void move(const T& mx, const T& my) override
+    GOBLIB_INLINE void move(const T& mx, const T& my) 
     {
         _end.offset(mx - _start.x(), my - _start.y());
         _start.move(mx, my);
     }
-    GOBLIB_INLINE virtual void offset(const T& ox, const T& oy) override
+    GOBLIB_INLINE void offset(const T& ox, const T& oy) 
     {
         _start.offset(ox, oy);
         _end.offset(ox, oy);
     }
-    /// @}
     
   private:
     Point<T> _start, _end;

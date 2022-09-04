@@ -229,7 +229,7 @@ class TaskTree : public FamilyTree<T>
     /// @name Message
     /// @{
     /*! Call onReceive() of target and does not return until processed message */
-    template<class U, typename std::enable_if<std::is_base_of<goblib::Task, U>::value, nullptr_t>::type = nullptr>
+    template<class U, typename std::enable_if<std::is_base_of<goblib::Task, U>::value, std::nullptr_t>::type = nullptr>
     void sendMessage(const TaskMessage& m, U* target)
     {
         assert(target);
@@ -237,7 +237,7 @@ class TaskTree : public FamilyTree<T>
     }
 
     /*! Call obReceive() of target on TaskTree::pump() */
-    template<class U, typename std::enable_if<std::is_base_of<goblib::Task, U>::value, nullptr_t>::type = nullptr>
+    template<class U, typename std::enable_if<std::is_base_of<goblib::Task, U>::value, std::nullptr_t>::type = nullptr>
     void postMessage(const TaskMessage& m, U* target)
     {
         assert(target);
@@ -252,7 +252,7 @@ class TaskTree : public FamilyTree<T>
     }
     
     /*! Call onReceive() of top and his children  and does not return until processed message */
-    template<class U, typename std::enable_if<std::is_base_of<T, U>::value, nullptr_t>::type = nullptr>
+    template<class U, typename std::enable_if<std::is_base_of<T, U>::value, std::nullptr_t>::type = nullptr>
     void sendBroadcastMessage(const TaskMessage& m, U* top)
     {
         T* t = static_cast<T*>(top ? top : this->root());
@@ -266,7 +266,7 @@ class TaskTree : public FamilyTree<T>
     }
 
     /*! Call obReceive() of top and his children on TaskTree::pump() */
-    template<class U, typename std::enable_if<std::is_base_of<T, U>::value, nullptr_t>::type = nullptr>
+    template<class U, typename std::enable_if<std::is_base_of<T, U>::value, std::nullptr_t>::type = nullptr>
     void postBroadcastMessage(const TaskMessage& m, U* top)
     {
         TaskMessage msg(m);

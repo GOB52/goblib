@@ -35,7 +35,7 @@ void dump(const std::uint8_t* buf, const std::size_t sz)
             *s++ = std::isprint(v) ? v : '.';
             ++i;
         }
-        if(i < perline) { printf("%*c", (perline - i)*3, ' '); }
+        if(i < perline) { printf("%*c", (int)((perline - i)*3), ' '); }
     
         *s = '\0';
         printf("%s\n", strbuf);

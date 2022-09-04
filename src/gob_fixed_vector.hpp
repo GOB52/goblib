@@ -58,7 +58,7 @@ class FixedVector
 
     template <class InputIter> FixedVector(InputIter first, InputIter last) : _data(nullptr), _tail(nullptr)
     {
-        assert(last - first <= Max && "Illegal size");
+        assert((size_t)(last - first) <= Max && "Illegal size");
         auto n = std::min(Max, static_cast<size_type>(last - first));
 
         _data = reinterpret_cast<T*>(new std::uint8_t[sizeof(T) * Max]);
@@ -135,7 +135,7 @@ class FixedVector
     /// @{
     template <class InputIterator> void assign(InputIterator first, InputIterator last)
     {
-        assert(last - first <= Max && "Illegal size");
+        assert((size_t)(last - first) <= Max && "Illegal size");
         clear();
         auto n = std::min(max_size(), static_cast<size_type>(last - first));
         last = first + n;
@@ -415,7 +415,7 @@ class FixedVector
     void _create(const_iterator beg, const_iterator end)
     {
         auto n = end - beg;
-        assert(n <= Max && "Illegal range");
+        assert((size_t)n <= Max && "Illegal range");
         n = std::min(static_cast<std::size_t>(n), Max);
         _data = reinterpret_cast<T*>(new std::uint8_t[sizeof(T) * Max]);
         assert(_data);
